@@ -4,6 +4,13 @@
 # Type: Bool
 freeipa_client_install_pkgs: True
 
+# FreeIPA client default server/host/domain/realm options
+# Type: Str
+freeipa_client_hostname: "{{ ansible_hostname }}"
+freeipa_client_fqdn:     "{{ ansible_fqdn }}"
+freeipa_client_domain:   "{{ (freeipa_client_server | mandatory).split('.',1)[1] }}"
+freeipa_client_realm:    "{{ freeipa_client_domain | upper }}"
+
 # The base command for the FreeIPA client installation
 # Type: Str
 freeipa_client_install_base_command: ipa-client-install --unattended
@@ -11,10 +18,10 @@ freeipa_client_install_base_command: ipa-client-install --unattended
 # The default FreeIPA client installation options
 # Type: List
 freeipa_client_install_options:
+  - "--hostname={{ freeipa_client_fqdn }}"
+  - "--server={{ freeipa_client_server | mandatory }}"
   - "--domain={{ freeipa_client_domain }}"
-  - "--server={{ freeipa_client_server }}"
   - "--realm={{ freeipa_client_realm }}"
-  - "--principal={{ freeipa_client_principal }}"
-  - "--password={{ freeipa_client_password }}"
+  - "--principal={{ freeipa_client_principal | mandatory }}"
+  - "--password={{ freeipa_client_password | mandatory }}"
   - "--mkhomedir"
-  - "--hostname={{ freeipa_client_fqdn | default(ansible_fqdn) }}"
