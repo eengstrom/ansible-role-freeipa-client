@@ -11,7 +11,15 @@
       paths:
         - vars
 
+- include_tasks: debug.yml
+  tags: [ never, debug ]
+
 - include_tasks: install-pkgs.yml
   when: freeipa_client_install_pkgs
 
 - include_tasks: freeipa-client-install.yml
+
+- include_tasks: pam-mkhomedir-fix.yml
+  when: ("--mkhomedir" in freeipa_client_install_options) and
+        (ansible_distribution == "Ubuntu") and
+        (ansible_distribution_major_version|int <= 16)
