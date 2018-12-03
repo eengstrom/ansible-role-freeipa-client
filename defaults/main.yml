@@ -2,7 +2,7 @@
 
 # Install FreeIPA packages (set to False if you're using `timorunge.freeipa`)
 # Type: Bool
-freeipa_client_install_pkgs: True
+freeipa_client_install_pkgs: true
 
 # FreeIPA client default server/host/domain/realm options
 # Type: Str

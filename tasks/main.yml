@@ -1,25 +1,15 @@
 ---
 
 - name: Gather OS specific variables
-  include_vars: "{{ lookup('first_found', params) }}"
-  vars:
-    params:
-      files:
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
         - "{{ ansible_os_family }}-{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
         - "{{ ansible_os_family }}-{{ ansible_distribution }}.yml"
         - "{{ ansible_os_family }}.yml"
-      paths:
-        - vars
-
-- include_tasks: debug.yml
-  tags: [ never, debug ]
+      skip: true
 
 - include_tasks: install-pkgs.yml
   when: freeipa_client_install_pkgs
 
 - include_tasks: freeipa-client-install.yml
-
-- include_tasks: pam-mkhomedir-fix.yml
-  when: ("--mkhomedir" in freeipa_client_install_options) and
-        (ansible_distribution == "Ubuntu") and
-        (ansible_distribution_major_version|int <= 16)
