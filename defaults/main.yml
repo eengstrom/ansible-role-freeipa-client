@@ -1,15 +1,19 @@
 ---
 
-# Install FreeIPA packages (set to False if you're using `timorunge.freeipa`)
+# Install FreeIPA packages (set to False if you're using source build; e.g. `timorunge.freeipa`)
 # Type: Bool
 freeipa_client_install_pkgs: true
+
+# Configure (aka "install") the FreeIPA client
+# Type: Bool
+freeipa_client_run_installer: true
 
 # FreeIPA client default server/host/domain/realm options
 # Type: Str
 freeipa_client_hostname: "{{ ansible_hostname }}"
 freeipa_client_fqdn:     "{{ ansible_fqdn }}"
-freeipa_client_domain:   "{{ (freeipa_client_server | mandatory).split('.',1)[1] }}"
-freeipa_client_realm:    "{{ freeipa_client_domain | upper }}"
+freeipa_domain:          "{{ (freeipa_servers[0] | mandatory).split('.',1)[1] }}"
+freeipa_realm:           "{{ freeipa_domain | upper }}"
 
 # The base command for the FreeIPA client installation
 # Type: Str
@@ -19,9 +23,9 @@ freeipa_client_install_base_command: ipa-client-install --unattended
 # Type: List
 freeipa_client_install_options:
   - "--hostname={{ freeipa_client_fqdn }}"
-  - "--server={{ freeipa_client_server | mandatory }}"
-  - "--domain={{ freeipa_client_domain }}"
-  - "--realm={{ freeipa_client_realm }}"
-  - "--principal={{ freeipa_client_principal | mandatory }}"
-  - "--password={{ freeipa_client_password | mandatory }}"
+  - "--server={{ freeipa_servers | mandatory | join(' --server=') }}"
+  - "--domain={{ freeipa_domain }}"
+  - "--realm={{ freeipa_realm }}"
+  - "--principal={{ freeipa_admin_principal | mandatory }}"
+  - "--password={{ freeipa_admin_password | mandatory }}"
   - "--mkhomedir"
