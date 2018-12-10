@@ -12,7 +12,7 @@ freeipa_client_run_installer: true
 # Type: Str
 freeipa_client_hostname: "{{ ansible_hostname }}"
 freeipa_client_fqdn:     "{{ ansible_fqdn }}"
-freeipa_domain:          "{{ (freeipa_servers[0] | mandatory).split('.',1)[1] }}"
+freeipa_domain:          "{{ (freeipa_server | mandatory).split('.',1)[1] }}"
 freeipa_realm:           "{{ freeipa_domain | upper }}"
 
 # The base command for the FreeIPA client installation
@@ -21,11 +21,28 @@ freeipa_client_install_base_command: ipa-client-install --unattended
 
 # The default FreeIPA client installation options
 # Type: List
-freeipa_client_install_options:
+freeipa_client_install_options_default:
   - "--hostname={{ freeipa_client_fqdn }}"
-  - "--server={{ freeipa_servers | mandatory | join(' --server=') }}"
   - "--domain={{ freeipa_domain }}"
   - "--realm={{ freeipa_realm }}"
   - "--principal={{ freeipa_admin_principal | mandatory }}"
-  - "--password={{ freeipa_admin_password | mandatory }}"
+  - "--password='{{ freeipa_admin_password | mandatory }}'"
   - "--mkhomedir"
+
+# Transform the name of the server and the list of replicas into
+# `--server=` options. Note that we remove "this host" from the list
+# of replcas before transforming into option strings:
+# Type: List
+freeipa_client_install_options_servers:
+ "{{ ( [ freeipa_server | mandatory ] + (freeipa_replicas | d([])))
+       | reject('match', freeipa_client_fqdn)
+       | map('regex_replace', '^', '--server=')
+       | list
+  }}"
+
+# The complete list of client install options:
+# Type: List
+freeipa_client_install_options:
+  "{{ freeipa_client_install_options_default
+      + freeipa_client_install_options_servers
+   }}"
