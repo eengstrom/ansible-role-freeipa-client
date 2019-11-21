@@ -1,9 +1,9 @@
 ---
 
 - name: Run the FreeIPA Client installer
+  throttle: 1  # sometimes it seems to conflict and fail when multiple, parallel attemtps
   args:
     creates: /etc/ipa/default.conf
-    throttle: 1  # sometimes it seems to conflict and fail when multiple, parallel attemtps
   command: >
     {{ freeipa_client_install_base_command }}
     {{ freeipa_client_install_options | join(' ') }}
