@@ -1,0 +1,12 @@
+---
+- name: Converge
+  hosts: all
+  pre-tasks
+
+  roles:
+    - role: eengstrom.freeipa-client
+      vars:
+        - freeipa_servers:         [ 'ipa.example.com' ]
+        - freeipa_admin_principal: 'admin'
+        - freeipa_admin_password:  'SECRET'
+        - freeipa_server_manage_host: false
